@@ -29,7 +29,7 @@ die()  { printf '%s✗ %s%s\n' "$C_RED" "$*" "$C_RST" >&2; exit 1; }
 DOTFILES_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 EMBED_PARENT="$HOME/work/embedded_systems"
 EMBED_DIR="$EMBED_PARENT/embed-workflow"
-EMBED_REPO_URL="${EMBED_REPO_URL:-https://github.com/CHANGE_ME/embed-workflow.git}"
+EMBED_REPO_URL="${EMBED_REPO_URL:-git@github.com:mayn_k/embed-workflow.git}"
 
 say "Dotfiles bootstrap — from $DOTFILES_DIR"
 
