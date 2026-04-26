@@ -1,0 +1,1 @@
+/home/mayn_k/work/embedded_systems/embed-workflow/nvim/plugins/cmp.lua

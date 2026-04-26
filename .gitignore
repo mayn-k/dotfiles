@@ -1,0 +1,15 @@
+# Per-machine overrides — not tracked
+.zshrc.local
+.bashrc.local
+
+# Editor/OS junk
+*.swp
+*.swo
+.DS_Store
+__pycache__/
+*.pyc
+
+# lazy-lock.json can go either way. Track it if you want reproducible plugin versions
+# across machines. Ignore it if you want each machine to have the latest.
+# Uncomment if you want to ignore:
+# nvim/.config/nvim/lazy-lock.json

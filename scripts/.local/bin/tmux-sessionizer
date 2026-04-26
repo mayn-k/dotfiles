@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# tmux-sessionizer — fuzzy-pick a project dir and switch to its tmux session.
+# Inspired by ThePrimeagen's sessionizer.
+#
+# Search paths: customize below. Finds directories up to depth 2 under each root.
+
+set -euo pipefail
+
+# Where to look for "projects"
+ROOTS=(
+    "$HOME/work/embedded_systems/projects"
+    "$HOME/work/embedded_systems/stm/stm32l4"
+    "$HOME/work/cp"
+    "$HOME/projects"
+    "$HOME/code"
+    "$HOME/personal"
+)
+
+# If argument given, use it; otherwise fuzzy-pick
+if [[ $# -eq 1 ]]; then
+    selected="$1"
+else
+    # Build list of candidate dirs (existing only)
+    candidates=()
+    for r in "${ROOTS[@]}"; do
+        [[ -d "$r" ]] && candidates+=("$r")
+    done
+    if [[ ${#candidates[@]} -eq 0 ]]; then
+        echo "No project roots exist. Create some under ~/work/ first."
+        exit 1
+    fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "fzf not installed: sudo apt install fzf"
+        exit 1
+    fi
+    selected=$(find "${candidates[@]}" -mindepth 1 -maxdepth 2 -type d 2>/dev/null \
+        | fzf --prompt="project> ")
+fi
+
+[[ -z "$selected" ]] && exit 0
+
+selected_name=$(basename "$selected" | tr '.' '_')
+tmux_running=$(pgrep tmux || true)
+
+# Not in tmux and no server running: start fresh
+if [[ -z "${TMUX:-}" && -z "$tmux_running" ]]; then
+    tmux new-session -s "$selected_name" -c "$selected"
+    exit 0
+fi
+
+# Session doesn't exist yet: create detached
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+    tmux new-session -ds "$selected_name" -c "$selected"
+fi
+
+# Switch / attach
+if [[ -z "${TMUX:-}" ]]; then
+    tmux attach -t "$selected_name"
+else
+    tmux switch-client -t "$selected_name"
+fi
